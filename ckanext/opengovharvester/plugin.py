@@ -3,13 +3,24 @@ import ckan.plugins.toolkit as toolkit
 from ckanext.harvest.interfaces import IHarvester
 import logging
 from ckanext.harvest.harvesters.ckanharvester import CKANHarvester
+import requests
+import os
+import json
+import wget
+import urlparse
 
 log = logging.getLogger(__name__)
 def download_resource_data(url):
-    import wget
     out_folder = '/tmp'
-    download_path = wget.download(url, out=out_folder, bar=None)
-    return download_path
+    parse_result = urlparse.urlparse(url)
+    filename = os.path.basename(parse_result.path)
+    file_path = '%s/%s'%(out_folder, filename)
+
+    if not os.path.exists(file_path):
+        download_path = wget.download(url, out=out_folder, bar=None)
+        return download_path
+    else:
+        return file_path
 
 class OpengovharvesterPlugin(plugins.SingletonPlugin):
     plugins.implements(plugins.IConfigurer)
@@ -51,7 +62,6 @@ class OpengovharvesterPlugin(plugins.SingletonPlugin):
         import_result = self.ckan_harvester.import_stage(harvest_obj)
 
         try:
-            import json
             content = json.loads(harvest_obj.content)
             resources = content.get('resources',[])
             if resources:
@@ -67,9 +77,9 @@ class OpengovharvesterPlugin(plugins.SingletonPlugin):
                         #FileStore API
                         #Update resource 'url' to upload location
                         new_resource_url = self.upload_to_filestore(tmp_resource_path, resource.get('package_id'), resource.get('id'))
-                        log.info('Set new url :%s' % (new_resource_url))
+
                     else:
-                        raise 'Empty resource url'
+                        raise Exception('Empty resource url')
         except Exception as e:
             raise
         return import_result
@@ -79,15 +89,12 @@ class OpengovharvesterPlugin(plugins.SingletonPlugin):
         '''
         Returns new local resource URL
         '''
-        import requests
-        import os
-        import json
         filestore_api = '{}/api/action/resource_update'.format(self.config.get('ckan.site_url', 'http://0.0.0.0:5000'))
         file_name, file_ext = os.path.splitext(file_path)
         file_ext = file_ext.replace('.', '')
         ckan_api_key = self.ckan_harvester.config.get("ckan_api_key", '')
         if not ckan_api_key:
-            raise 'CKAN API Key not found in harvester configuration'
+            raise Exception('CKAN API Key not found in harvester configuration')
 
         result = requests.post(filestore_api,
                       data={"package_id":package_id, "id":resource_id, 'format': file_ext},
@@ -98,5 +105,6 @@ class OpengovharvesterPlugin(plugins.SingletonPlugin):
             if api_response.get('success') == True:
                 result = api_response.get('result')
                 return result.get('url')
+
         except Exception as e:
-            raise
+            return resource_id

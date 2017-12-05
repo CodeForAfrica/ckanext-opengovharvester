@@ -10,6 +10,7 @@ import wget
 import urlparse
 
 log = logging.getLogger(__name__)
+
 def download_resource_data(url):
     out_folder = '/tmp'
     parse_result = urlparse.urlparse(url)
@@ -48,6 +49,9 @@ class OpengovharvesterPlugin(plugins.SingletonPlugin):
 
 
     def gather_stage(self, harvest_job):
+        '''
+        Gather stage
+        '''
         return self.ckan_harvester.gather_stage(harvest_job)
 
     def fetch_stage(self, harvest_obj):
@@ -56,9 +60,12 @@ class OpengovharvesterPlugin(plugins.SingletonPlugin):
 
     def import_stage(self, harvest_obj):
         '''
-        Performs original ckan harverst import_stage task, downloads resource file to local storage \
-        , uploads to local CKAN instance via FileStore API then updates resource URLs of the harvested datasets.\
-          '''
+        Import stage
+
+        Performs original CKAN's harverst import_stage task, downloads the associated resource files(into tmp folder)\
+        and uploads to local CKAN instance via FileStore API then updates resource URLs of the harvested datasets.\
+        The idea is to download the resource file from  Source instance and upload it to destination CKAN.
+        '''
         import_result = self.ckan_harvester.import_stage(harvest_obj)
 
         try:
@@ -69,19 +76,23 @@ class OpengovharvesterPlugin(plugins.SingletonPlugin):
                     current_url = resource.get('url', '')
                     if current_url:
                         log.info(current_url)
-                        #Download file and push  to cloud storage
+                        #Resource file download
+                        tmp_resource_path = download_resource_data(current_url)
+
+                        #Upload options to destination CKAN
                         #1. FileStore API - call filestore api to upload file(Auto upload to aws if configured)
                         #2. Upload to a server and provide a valid url path to file, TODO
-                        #Download...ugly!!
-                        tmp_resource_path = download_resource_data(current_url)
+
                         #FileStore API
                         #Update resource 'url' to upload location
-                        new_resource_url = self.upload_to_filestore(tmp_resource_path, resource.get('package_id'), resource.get('id'))
+                        new_resource_url = self.upload_to_filestore(tmp_resource_path,\
+                         resource.get('package_id'), resource.get('id'))
 
                     else:
                         raise Exception('Empty resource url')
         except Exception as e:
             raise
+
         return import_result
 
 

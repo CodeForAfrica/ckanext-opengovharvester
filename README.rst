@@ -1,57 +1,22 @@
-.. You should enable this project on travis-ci.org and coveralls.io to make
-   these badges work. The necessary Travis and Coverage config files have been
-   generated for you.
-
-.. image:: https://travis-ci.org/codefortanzania/ckanext-opengovharvester.svg?branch=master
-    :target: https://travis-ci.org/codefortanzania/ckanext-opengovharvester
-
-.. image:: https://coveralls.io/repos/codefortanzania/ckanext-opengovharvester/badge.svg
-  :target: https://coveralls.io/r/codefortanzania/ckanext-opengovharvester
-
-.. image:: https://pypip.in/download/ckanext-opengovharvester/badge.svg
-    :target: https://pypi.python.org/pypi//ckanext-opengovharvester/
-    :alt: Downloads
-
-.. image:: https://pypip.in/version/ckanext-opengovharvester/badge.svg
-    :target: https://pypi.python.org/pypi/ckanext-opengovharvester/
-    :alt: Latest Version
-
-.. image:: https://pypip.in/py_versions/ckanext-opengovharvester/badge.svg
-    :target: https://pypi.python.org/pypi/ckanext-opengovharvester/
-    :alt: Supported Python versions
-
-.. image:: https://pypip.in/status/ckanext-opengovharvester/badge.svg
-    :target: https://pypi.python.org/pypi/ckanext-opengovharvester/
-    :alt: Development Status
-
-.. image:: https://pypip.in/license/ckanext-opengovharvester/badge.svg
-    :target: https://pypi.python.org/pypi/ckanext-opengovharvester/
-    :alt: License
-
 =============
 ckanext-opengovharvester
 =============
 
-.. Put a description of your extension here:
-   What does it do? What features does it have?
-   Consider including some screenshots or embedding a video!
+.. A CKAN Harvester extension that downloads the associated resource files,
+ uploads to destination CKAN instance via FileStore API and updates resource URLs of the harvested datasets.
 
 
 ------------
 Requirements
 ------------
 
-For example, you might want to mention here which versions of CKAN this
-extension works with.
+This extension requires an installation of CKAN. To install and set up CKAN, visit CKAN Documentation
+
 
 
 ------------
 Installation
 ------------
-
-.. Add any additional install steps to the list below.
-   For example installing any non-Python dependencies or adding any required
-   config settings.
 
 To install ckanext-opengovharvester:
 
@@ -76,12 +41,9 @@ To install ckanext-opengovharvester:
 Config Settings
 ---------------
 
-Document any optional config settings here. For example::
+    # Configure user API key in the CKANHarvester `Configuration` JSON for uploading to destination CKAN instance
 
-    # The minimum number of hours to wait before re-checking a resource
-    # (optional, default: 24).
-    ckanext.opengovharvester.some_setting = some_default_value
-
+    {..., "ckan_api_key": ""}
 
 ------------------------
 Development Installation

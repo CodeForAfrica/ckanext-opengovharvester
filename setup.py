@@ -32,8 +32,10 @@ setup(
 	"""
     [ckan.plugins]
 	# Add plugins here, eg
+
 	harvest=ckanext.harvest.plugin:Harvest
 	ckan_harvester=ckanext.harvest.harvesters:CKANHarvester
+	opengovckanharvester=ckanext.harvest.harvesters.opengovckanharvester:OpengovCKANHarvester
     [ckan.test_plugins]
 	test_harvester=ckanext.harvest.tests.test_queue:MockHarvester
 	test_harvester2=ckanext.harvest.tests.test_queue2:MockHarvester
